@@ -5,7 +5,7 @@
 # --- Python Ver: 2.7
 # --- Details At: https://iotbytes.wordpress.com/store-mqtt-data-from-sensors-into-sql-database/
 # ------------------------------------------
-
+import datetime
 
 from pymongo import MongoClient
 import json
@@ -21,10 +21,10 @@ tempSensors = db['sensors'].find({'topic': 'Temperature'})
 def temp_handler(json_data):
     json_dict = json.loads(json_data)
     sensor_id = json_dict['Sensor_ID']
-    data_and_time = json_dict['Date']
+    data_and_time = data_and_time = datetime.datetime.strptime(json_dict['Date'], "%d-%m-%Y %H:%M:%S")
     temperature = json_dict['Temperature']
     to_save = {"sensorId": sensor_id,
-              "date": data_and_time, "temp": temperature}
+               "date": data_and_time, "temp": temperature}
 
     db.temperature.insert_one(to_save)
 
@@ -32,10 +32,10 @@ def temp_handler(json_data):
 def hum_handler(json_data):
     json_dict = json.loads(json_data)
     sensor_id = json_dict['Sensor_ID']
-    data_and_time = json_dict['Date']
+    data_and_time = datetime.datetime.strptime(json_dict['Date'], "%d-%m-%Y %H:%M:%S")
     humidity = json_dict['Humidity']
     to_save = {"sensorId": sensor_id,
-              "date": data_and_time, "humidity": humidity}
+               "date": data_and_time, "humidity": humidity}
 
     db.humidity.insert_one(to_save)
 
@@ -43,10 +43,10 @@ def hum_handler(json_data):
 def acidity_handler(json_data):
     json_dict = json.loads(json_data)
     sensor_id = json_dict['Sensor_ID']
-    data_and_time = json_dict['Date']
+    data_and_time = data_and_time = datetime.datetime.strptime(json_dict['Date'], "%d-%m-%Y %H:%M:%S")
     acidity = json_dict['Acidity']
     to_save = {"sensorId": sensor_id,
-              "date": data_and_time, "acidity": acidity}
+               "date": data_and_time, "acidity": acidity}
 
     db.acidity.insert_one(to_save)
 
