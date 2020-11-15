@@ -13,13 +13,14 @@ import threading
 import json
 from datetime import datetime
 
-# ====================================================
-# MQTT Settings
+from shop import Shop
+
 MQTT_Broker = "test.mosquitto.org"
 MQTT_Port = 1883
 Keep_Alive_Interval = 45
-MQTT_Topic_Humidity = "Home/WalawenderWedzicha/Humidity"
-MQTT_Topic_Temperature = "Home/WalawenderWedzicha/Temperature"
+MQTT_Topic = "Home/WalawenderWedzicha/ShopTraffic"
+current_people_quantity = 0
+max_people_quantity = 3000
 
 
 def on_connect(client, userdata, rc):
@@ -52,36 +53,29 @@ def publish_to_topic(topic, message):
     print("")
 
 
-toggle = 0
-
-
 def publish_fake_sensor_values_to_mqtt():
+    global current_people_quantity
+    global max_people_quantity
+
+    people_entered = random.randint(0, 100)
+    while max_people_quantity - current_people_quantity - people_entered < 0:
+        people_entered = random.randint(0, 100)
+    people_left = random.randint(0, 100)
+    while current_people_quantity - people_left < 0:
+        people_left = random.randint(0, 100)
+
+    current_people_quantity = current_people_quantity - people_left + people_entered
+
     threading.Timer(3.0, publish_fake_sensor_values_to_mqtt).start()
-    global toggle
 
-    if toggle == 0:
-        humidity_fake_value = float("{0:.2f}".format(random.uniform(50, 100)))
+    publish_data = {'sensor_id': 1, 'shop_id': 1, 'date': (datetime.utcnow()).strftime("%d-%m-%Y %H:%M:%S"),
+                    'people_entered': people_entered, 'people_left': people_left,
+                    'current_people_quantity': current_people_quantity}
+    publish_json_data = json.dumps(publish_data)
 
-        humidity_data = {'Sensor_ID': "Zamioculcas", 'Date': (datetime.today()).strftime(
-            "%d-%m-%Y %H:%M:%S"), 'Humidity': humidity_fake_value}
-        humidity_json_data = json.dumps(humidity_data)
-
-        print("Publishing fake Humidity Value: " +
-              str(humidity_fake_value) + "...")
-        publish_to_topic(MQTT_Topic_Humidity, humidity_json_data)
-        toggle = 1
-
-    else:
-        temperature_fake_value = float("{0:.2f}".format(random.uniform(1, 30)))
-
-        temperature_data = {'Sensor_ID': "Zamioculcas", 'Date': (
-            datetime.today()).strftime("%d-%m-%Y %H:%M:%S"), 'Temperature': temperature_fake_value}
-        temperature_json_data = json.dumps(temperature_data)
-
-        print("Publishing fake Temperature Value: " +
-              str(temperature_fake_value) + "...")
-        publish_to_topic(MQTT_Topic_Temperature, temperature_json_data)
-        toggle = 0
+    print(
+        f"Publishing fake people traffic...\nEntered:{people_entered}\nLeft:{people_left}\nCurrent quantity:{current_people_quantity}")
+    publish_to_topic(MQTT_Topic, publish_json_data)
 
 
 if __name__ == "__main__":
