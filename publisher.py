@@ -68,7 +68,7 @@ def publish_fake_sensor_values_to_mqtt():
 
     threading.Timer(3.0, publish_fake_sensor_values_to_mqtt).start()
 
-    publish_data = {'sensor_id': 1, 'shop_id': 1, 'date': (datetime.utcnow()).strftime("%d-%m-%Y %H:%M:%S"),
+    publish_data = {'sensor_id': 1, 'shop_id': 1, 'date': (datetime.now()).strftime("%d-%m-%Y %H:%M:%S"),
                     'people_entered': people_entered, 'people_left': people_left,
                     'current_people_quantity': current_people_quantity}
     publish_json_data = json.dumps(publish_data)
