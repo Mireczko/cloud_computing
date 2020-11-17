@@ -15,6 +15,8 @@ MQTT_Port = 1883
 Keep_Alive_Interval = 45
 MQTT_Topic = "Home/WalawenderWedzicha/#"
 
+current_people_quantity = 0
+max_people_quantity = 500
 # Subscribe to all Sensors at Base Topic
 
 
